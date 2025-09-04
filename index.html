@@ -1,79 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Katende Store — Loja de Eletrônicos</title>
-  <meta name="description" content="Katende Store - Loja de eletrônicos. Exemplo funcional com carrinho e pagamento via PIX.">
-  <style>
-    :root{
-      --bg:#050607;
-      --panel:#0b0d0f;
-      --green-1:#7CFC00;
-      --green-2:#10b24a;
-      --muted:#cfcfcf;
-      --glass: rgba(255,255,255,0.03);
-      --accent: linear-gradient(90deg,var(--green-1),var(--green-2));
-      font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;background:var(--bg);color:var(--muted);margin:0}
-    .app{max-width:1200px;margin:30px auto;padding:22px}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-    .brand{display:flex;align-items:center;gap:14px}
-    .logo{width:64px;height:64px;background:var(--accent);border-radius:12px;display:grid;place-items:center;color:#021;font-weight:800;font-size:22px}
-    .brand h1{font-size:22px;margin:0;color:var(--green-1)}
-    .brand p{margin:0;font-size:12px;color:#9aa}
-    .controls{display:flex;gap:12px;align-items:center}
-    .search{background:var(--panel);border:1px solid rgba(255,255,255,0.04);padding:10px 12px;border-radius:10px;color:var(--muted)}
-    .btn{background:var(--green-2);color:#001;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
-    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
-    .grid{display:grid;grid-template-columns:1fr 340px;gap:20px}
-    .products{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:18px;border-radius:16px}
-    .product-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
-    .card{background:var(--glass);padding:12px;border-radius:12px;display:flex;flex-direction:column;gap:8px}
-    .img{height:140px;border-radius:8px;background:linear-gradient(135deg,var(--green-2),#043200);display:flex;align-items:center;justify-content:center;color:#001;font-weight:800}
-    .title{font-weight:700;color:#dfffe0}
-    .price{font-weight:800;color:var(--green-1)}
-    .add{margin-top:auto;display:flex;gap:8px}
-    .cart{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:18px;border-radius:16px;min-height:220px;transition:transform 0.3s ease}
-    .cart h3{margin:0 0 12px 0;color:var(--green-1)}
-    .cart-list{display:flex;flex-direction:column;gap:10px}
-    .cart-item{display:flex;align-items:center;gap:10px;padding:8px;background:rgba(255,255,255,0.01);border-radius:10px;justify-content:space-between}
-    .qty{display:flex;gap:6px;align-items:center}
-    .small{font-size:13px;color:#9aa}
-    footer{margin-top:16px;text-align:center;color:#777;font-size:13px}
-
-    /* --- Carrinho retrátil (mobile) --- */
-    @media(max-width:880px){
-      .grid{grid-template-columns:1fr}
-      .cart{
-        position:fixed;
-        top:0;right:0;
-        width:80%;
-        height:100%;
-        max-width:340px;
-        background:var(--panel);
-        transform:translateX(100%);
-        z-index:100;
-        box-shadow: -10px 0 30px rgba(0,0,0,0.6);
-      }
-      .cart.open{transform:translateX(0)}
-      /* show close button inside cart */
-      #close-cart{display:block !important}
-    }
-
-    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:200}
-    .modal.open{display:flex}
-    .modal-card{width:100%;max-width:720px;background:var(--panel);padding:20px;border-radius:12px}
-    .two{display:flex;gap:16px}
-    .left{flex:1}
-    .right{width:260px}
-    input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted)}
-    .qrwrap{display:grid;place-items:center;padding:12px;background:rgba(255,255,255,0.02);border-radius:10px}
-    @media(max-width:880px){.two{flex-direction:column}.right{width:100%}}
-  </style>
+  <meta name="description"
+    content="Katende Store - Loja de eletrônicos. Exemplo funcional com carrinho e pagamento via PIX.">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <div class="app">
     <header>
@@ -86,7 +22,8 @@
       </div>
       <div class="controls">
         <input id="search" class="search" placeholder="Procurar por notebook, PC..." aria-label="Pesquisar produtos" />
-        <button id="open-cart" class="btn" aria-controls="cart-panel" aria-expanded="false">Carrinho (<span id="cart-count">0</span>)</button>
+        <button id="open-cart" class="btn" aria-controls="cart-panel" aria-expanded="false">Carrinho (<span
+            id="cart-count">0</span>)</button>
       </div>
     </header>
 
@@ -132,191 +69,8 @@
     </div>
   </div>
 
-  <!-- QRCode lib -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-  <script>
-    // --- Config ---
-    const PIX_KEY = "369c15dc-6018-4442-8c06-c48afc8ebad4";
-
-    const defaultProducts = [
-      {id:1,name:'Notebook Gamer A4',desc:'i5, 8GB, SSD 512GB',price:2499.00,img:'note_g.jpeg'},
-      {id:2,name:'Notebook Slim B',desc:'i3, 8GB, SSD 256GB',price:1799.00,img:'note_s.jpeg'},
-      {id:3,name:'PC Gamer - Ryzen 5',desc:'Ryzen5, 16GB, RTX 1650',price:3499.00,img:'pc_g.jpg'},
-      {id:4,name:'Monitor 24\" FullHD',desc:'IPS, 75Hz',price:599.00,img:'moni_g.jpeg'}
-    ];
-    let products = [...defaultProducts];
-    let cart = {};
-
-    const el = id=>document.getElementById(id);
-    const formatMoney = v=>'R$ '+v.toFixed(2).replace('.',',');
-
-    // --- Render produtos ---
-    function renderProducts(){
-      const list = el('product-list'); list.innerHTML='';
-      products.forEach(p=>{
-        const card=document.createElement('div');card.className='card'; card.setAttribute('role','listitem');
-        card.innerHTML=`
-          <div class="img" aria-hidden="true"><img src="${p.img}" alt="${p.name}" style="max-height:100%;max-width:100%;border-radius:6px"></div>
-          <div class="title">${p.name}</div>
-          <div class="small">${p.desc}</div>
-          <div class="price">${formatMoney(p.price)}</div>
-          <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-            <button class="btn add-btn">Adicionar</button>
-            <button class="btn secondary" style="padding:8px 10px;font-size:13px" onclick="addToWishlist && addToWishlist(${p.id})">♥</button>
-          </div>`;
-        card.querySelector('.add-btn').onclick=()=>{ addToCart(p.id); };
-        list.appendChild(card);
-      });
-    }
-
-    // --- Cart functions ---
-    function addToCart(id){
-      cart[id] = (cart[id]||0) + 1;
-      renderCart();
-    }
-
-    function removeFromCart(id){
-      if(!cart[id]) return;
-      delete cart[id];
-      renderCart();
-    }
-
-    function changeQty(id, delta){
-      if(!cart[id]) return;
-      cart[id] = cart[id] + delta;
-      if(cart[id] <= 0) delete cart[id];
-      renderCart();
-    }
-
-    function renderCart(){
-      const cl=el('cart-list'); cl.innerHTML='';
-      let total=0,count=0;
-      Object.keys(cart).forEach(id=>{
-        const p=defaultProducts.find(x=>x.id==id); if(!p) return;
-        const qty=cart[id]; total+=p.price*qty; count+=qty;
-        const item = document.createElement('div');
-        item.className='cart-item';
-        item.innerHTML=`
-          <div style="flex:1">
-            <b>${p.name}</b>
-            <div class='small'>${p.desc}</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="small">${qty}x ${formatMoney(p.price)}</div>
-            <div style="display:flex;gap:6px;margin-left:8px">
-              <button class="btn secondary" style="padding:6px 8px;font-size:13px" data-action="minus">−</button>
-              <button class="btn secondary" style="padding:6px 8px;font-size:13px" data-action="plus">+</button>
-              <button class="btn secondary" style="padding:6px 8px;font-size:13px" data-action="remove">Remover</button>
-            </div>
-          </div>`;
-        // attach events
-        item.querySelector('[data-action="minus"]').onclick = ()=>changeQty(p.id, -1);
-        item.querySelector('[data-action="plus"]').onclick = ()=>changeQty(p.id, +1);
-        item.querySelector('[data-action="remove"]').onclick = ()=>removeFromCart(p.id);
-        cl.appendChild(item);
-      });
-      el('cart-total').textContent=formatMoney(total||0);
-      el('cart-count').textContent=count||0;
-    }
-
-    // --- PIX payload (simplified example) ---
-    function generatePixPayload(amount){
-      const format=(id,v)=>id.padStart(2,'0')+String(v.length).padStart(2,'0')+v;
-      let payload="";
-      payload+=format("00","01");
-      payload+=format("26",format("00","BR.GOV.BCB.PIX")+format("01",PIX_KEY));
-      payload+=format("52","0000");
-      payload+=format("53","986");
-      payload+=format("54",amount.toFixed(2));
-      payload+=format("58","BR");
-      payload+=format("59",".");
-      payload+=format("60",".");
-      payload+=format("62",format("05","12345"));
-      payload+="6304";
-      function crc16(str){
-        let crc=0xFFFF;
-        for(let c=0;c<str.length;c++){
-          crc^=str.charCodeAt(c)<<8;
-          for(let i=0;i<8;i++) crc=(crc&0x8000)?(crc<<1)^0x1021:(crc<<1);
-          crc&=0xFFFF;
-        }
-        return crc.toString(16).toUpperCase().padStart(4,'0');
-      }
-      return payload+crc16(payload);
-    }
-
-    // --- Events: checkout / modal ---
-    el('checkout').onclick=()=>{
-      let total=parseFloat(el('cart-total').textContent.replace('R$','').replace(/\./g,'').replace(',','.'))||0;
-      if(total<=0) return alert("Carrinho vazio");
-      el('modal').classList.add('open');
-      const payload=generatePixPayload(total);
-      el('qr-text').value=payload;
-      el('qrcode').innerHTML='';
-      try {
-        new QRCode(el('qrcode'),{text:payload,width:220,height:220});
-      } catch(e){
-        el('qrcode').textContent = payload; // fallback
-      }
-    };
-    el('close-modal').onclick=()=>el('modal').classList.remove('open');
-    el('copy-payload').onclick=()=>navigator.clipboard.writeText(el('qr-text').value).then(()=>alert("Pix copia e cola copiado!")).catch(()=>alert("Não foi possível copiar"));
-
-    // --- Carrinho retrátil (mobile) ---
-    const cartPanel = el('cart-panel');
-    const openCart = el('open-cart');
-    const closeCart = el('close-cart');
-
-    function openCartPanel(){
-      if(window.innerWidth <= 880){
-        cartPanel.classList.add('open');
-        closeCart.style.display = "block";
-        openCart.setAttribute('aria-expanded','true');
-        // prevent body scroll
-        document.body.style.overflow = 'hidden';
-      } else {
-        // on desktop, just scroll to the cart area
-        cartPanel.scrollIntoView({behavior:'smooth', block:'center'});
-      }
-    }
-
-    function closeCartPanel(){
-      cartPanel.classList.remove('open');
-      closeCart.style.display = "none";
-      openCart.setAttribute('aria-expanded','false');
-      document.body.style.overflow = '';
-    }
-
-    openCart.onclick = openCartPanel;
-    closeCart.onclick = closeCartPanel;
-
-    // close panel on resize to desktop
-    window.addEventListener('resize', ()=>{
-      if(window.innerWidth > 880){
-        cartPanel.classList.remove('open');
-        closeCart.style.display = 'none';
-        document.body.style.overflow = '';
-      }
-    });
-
-    // --- Busca (filtro em tempo real) ---
-    el('search').addEventListener('input', e=>{
-      const q = e.target.value.trim().toLowerCase();
-      if(!q) {
-        products = [...defaultProducts];
-      } else {
-        products = defaultProducts.filter(p=>p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
-      }
-      renderProducts();
-    });
-
-    // --- Inicialização ---
-    renderProducts();
-    renderCart();
-
-    // small helper (optional)
-    function addToWishlist(id){ alert('Wishlist (exemplo) - produto '+id); }
-  </script>
+  <script src="script.js"></script>
 </body>
+
 </html>
