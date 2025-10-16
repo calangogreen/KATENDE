@@ -1,7 +1,7 @@
 const PIX_KEY = "369c15dc-6018-4442-8c06-c48afc8ebad4";
 
 const defaultProducts = [
-    { id: 1, name: 'Notebook Gamer A4', desc: 'i5, 8GB, SSD 512GB', price: 2499.00, img: 'img/note_g.jpeg' },
+    { id: 1, name: 'Notebook Gamer A4', desc: 'i5, 8GB, SSD 512GB', price: 2599.00, img: 'img/note_g.jpeg' },
     { id: 2, name: 'Notebook Slim B', desc: 'i3, 8GB, SSD 256GB', price: 1799.00, img: 'img/note_s.jpeg' },
     { id: 3, name: 'PC Gamer - Ryzen 5', desc: 'Ryzen5, 16GB, RTX 1650', price: 3499.00, img: 'img/pc_g.jpg' },
     { id: 4, name: 'Monitor 24\" FullHD', desc: 'IPS, 75Hz', price: 599.00, img: 'img/moni_g.jpeg' }
