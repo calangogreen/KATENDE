@@ -1,7 +1,7 @@
 // ------------------- CONFIGURAÇÃO -------------------
-const PIX_KEY = "369c15dc-6018-4442-8c06-c48afc8ebad4"; // troque pela sua chave real
+const PIX_KEY = "369c15dc-6018-4442-8c06-c48afc8ebad4";
 const RECEIVER_NAME = "CALANGO ELETRONICOS";
-const CITY = "SERRINHA"; // cidade obrigatória para QR Pix válido
+const CITY = "SERRINHA";
 
 // ------------------- PRODUTOS -------------------
 const defaultProducts = [
@@ -94,7 +94,7 @@ function renderCart() {
 // ------------------- PIX VÁLIDO -------------------
 function generatePixPayload(amount) {
   const format = (id, v) => id.padStart(2, '0') + String(v.length).padStart(2, '0') + v;
-
+  
   let payload = '';
   payload += format('00', '01');
   payload += format('26', format('00', 'BR.GOV.BCB.PIX') + format('01', PIX_KEY));
@@ -104,20 +104,17 @@ function generatePixPayload(amount) {
   payload += format('58', 'BR');
   payload += format('59', RECEIVER_NAME);
   payload += format('60', CITY);
-
-  const txid = 'KATENDE' + Math.floor(Math.Random() + 10000);
-  const field62 = format('05', txid);
-  payload += format('62', field62)
-
-  payload += '6304'
+  payload += format('62', format('05', 'KATENDE'));
+  payload += '6304'; // checksum marker
 
   function crc16(str) {
     let crc = 0xFFFF;
     for (let c = 0; c < str.length; c++) {
       crc ^= str.charCodeAt(c) << 8;
-      for (let i = 0; i < 8; i++)
+      for (let i = 0; i < 8; i++) {
         crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : (crc << 1);
-      crc &= 0xFFFF;
+        crc &= 0xFFFF;
+      }
     }
     return crc.toString(16).toUpperCase().padStart(4, '0');
   }
@@ -127,24 +124,26 @@ function generatePixPayload(amount) {
 
 // ------------------- CHECKOUT -------------------
 el('checkout').onclick = () => {
-  const total = parseFloat(el('cart-total').textContent.replace('R$', '').replace(/\./g, '').replace(',', '.')) || 0;
+  const totalStr = el('cart-total').textContent.replace(/[R$\s]/g, '').replace('.', '').replace(',', '.');
+  const total = parseFloat(totalStr) || 0;
   if (total <= 0) return alert("Carrinho vazio");
 
   const payload = generatePixPayload(total);
   el('modal').classList.add('open');
   el('qr-text').value = payload;
 
-  // limpar e gerar QR Code com biblioteca qrcodejs
+  // limpar e gerar QR Code
   const qrContainer = el('qrcode');
   qrContainer.innerHTML = '';
-  const qr = new QRCode(qrContainer, {
-    text: payload,
+  new QRCode(qrContainer, {
+    text: payload.trim(),
     width: 220,
     height: 220,
     correctLevel: QRCode.CorrectLevel.M
   });
 };
 
+// ------------------- MODAL -------------------
 el('close-modal').onclick = () => el('modal').classList.remove('open');
 el('copy-payload').onclick = () => {
   navigator.clipboard.writeText(el('qr-text').value)
