@@ -1,5 +1,5 @@
 // ------------------- CONFIGURAÇÃO -------------------
-const PIX_KEY = "369c15dc-6018-4442-8c06-c48afc8ebad4"; // <- troque pela sua chave real
+const PIX_KEY = "369c15dc-6018-4442-8c06-c48afc8ebad4"; // troque pela sua chave real
 const RECEIVER_NAME = "CALANGO ELETRONICOS";
 const CITY = "SERRINHA"; // cidade obrigatória para QR Pix válido
 
@@ -31,7 +31,7 @@ function renderProducts() {
       <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
         <button class="btn add-btn">Adicionar</button>
       </div>`;
-    card.querySelector('.add-btn').onclick = () => { addToCart(p.id); };
+    card.querySelector('.add-btn').onclick = () => addToCart(p.id);
     list.appendChild(card);
   });
 }
@@ -42,13 +42,11 @@ function addToCart(id) {
   saveCart();
   renderCart();
 }
-
 function removeFromCart(id) {
   delete cart[id];
   saveCart();
   renderCart();
 }
-
 function changeQty(id, delta) {
   if (!cart[id]) return;
   cart[id] += delta;
@@ -56,11 +54,9 @@ function changeQty(id, delta) {
   saveCart();
   renderCart();
 }
-
 function saveCart() {
   localStorage.setItem('cart', JSON.stringify(cart));
 }
-
 function renderCart() {
   const cl = el('cart-list');
   cl.innerHTML = '';
@@ -69,7 +65,8 @@ function renderCart() {
     const p = defaultProducts.find(x => x.id == id);
     if (!p) return;
     const qty = cart[id];
-    total += p.price * qty; count += qty;
+    total += p.price * qty;
+    count += qty;
     const item = document.createElement('div');
     item.className = 'cart-item';
     item.innerHTML = `
@@ -97,17 +94,18 @@ function renderCart() {
 // ------------------- PIX VÁLIDO -------------------
 function generatePixPayload(amount) {
   const format = (id, v) => id.padStart(2, '0') + String(v.length).padStart(2, '0') + v;
-  let payload = "";
-  payload += format("00", "01");
-  payload += format("26", format("00", "BR.GOV.BCB.PIX") + format("01", PIX_KEY));
-  payload += format("52", "0000");
-  payload += format("53", "986"); // moeda BRL
-  payload += format("54", amount.toFixed(2)); // valor
-  payload += format("58", "BR");
-  payload += format("59", RECEIVER_NAME); // nome recebedor
-  payload += format("60", CITY); // cidade
-  payload += format("62", format("05", "Calango")); // txid
-  payload += "6304"; // campo do CRC
+
+  let payload = '';
+  payload += format('00', '01');
+  payload += format('26', format('00', 'BR.GOV.BCB.PIX') + format('01', PIX_KEY));
+  payload += format('52', '0000');
+  payload += format('53', '986');
+  payload += format('54', amount.toFixed(2));
+  payload += format('58', 'BR');
+  payload += format('59', RECEIVER_NAME);
+  payload += format('60', CITY);
+  payload += format('62', format('05', 'KATENDE'));
+  payload += '6304';
 
   function crc16(str) {
     let crc = 0xFFFF;
@@ -119,6 +117,7 @@ function generatePixPayload(amount) {
     }
     return crc.toString(16).toUpperCase().padStart(4, '0');
   }
+
   return payload + crc16(payload);
 }
 
@@ -127,25 +126,34 @@ el('checkout').onclick = () => {
   const total = parseFloat(el('cart-total').textContent.replace('R$', '').replace(/\./g, '').replace(',', '.')) || 0;
   if (total <= 0) return alert("Carrinho vazio");
 
-  el('modal').classList.add('open');
   const payload = generatePixPayload(total);
+  el('modal').classList.add('open');
   el('qr-text').value = payload;
 
-  el('qrcode').innerHTML = '';
-  new QRCode(el('qrcode'), { text: payload, width: 220, height: 220 });
+  // limpar e gerar QR Code com biblioteca qrcodejs
+  const qrContainer = el('qrcode');
+  qrContainer.innerHTML = '';
+  const qr = new QRCode(qrContainer, {
+    text: payload,
+    width: 220,
+    height: 220,
+    correctLevel: QRCode.CorrectLevel.M
+  });
 };
 
 el('close-modal').onclick = () => el('modal').classList.remove('open');
 el('copy-payload').onclick = () => {
   navigator.clipboard.writeText(el('qr-text').value)
-    .then(() => alert("Pix copiado!"))
-    .catch(() => alert("Falha ao copiar"));
+    .then(() => alert("Código Pix copiado!"))
+    .catch(() => alert("Não foi possível copiar"));
 };
 
 // ------------------- BUSCA -------------------
 el('search').addEventListener('input', e => {
   const q = e.target.value.trim().toLowerCase();
-  products = q ? defaultProducts.filter(p => p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)) : [...defaultProducts];
+  products = q
+    ? defaultProducts.filter(p => p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q))
+    : [...defaultProducts];
   renderProducts();
 });
 
@@ -168,12 +176,9 @@ function closeCartPanel() {
   closeCart.style.display = "none";
   document.body.style.overflow = '';
 }
-
 openCart.onclick = openCartPanel;
 closeCart.onclick = closeCartPanel;
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 880) closeCartPanel();
-});
+window.addEventListener('resize', () => { if (window.innerWidth > 880) closeCartPanel(); });
 
 // ------------------- INICIALIZAÇÃO -------------------
 renderProducts();
