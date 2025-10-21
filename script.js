@@ -104,8 +104,12 @@ function generatePixPayload(amount) {
   payload += format('58', 'BR');
   payload += format('59', RECEIVER_NAME);
   payload += format('60', CITY);
-  payload += format('62', format('05', 'KATENDE'));
-  payload += '6304';
+
+  const txid = 'KATENDE' + Math.floor(Math.Random() + 10000);
+  const field62 = format('05', txid);
+  payload += format('62', field62)
+
+  payload += '6304'
 
   function crc16(str) {
     let crc = 0xFFFF;
