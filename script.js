@@ -1,7 +1,7 @@
 // ------------------- CONFIGURAÇÃO -------------------
 const PIX_KEY = "369c15dc-6018-4442-8c06-c48afc8ebad4";
 const RECEIVER_NAME = "CALANGO ELETRONICOS";
-const CITY = "SERRINHA";
+const CITY = "SAO PAULO";
 
 // ------------------- PRODUTOS -------------------
 const defaultProducts = [
